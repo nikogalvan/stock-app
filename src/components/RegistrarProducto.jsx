@@ -12,53 +12,59 @@ const RegistrarProducto = (props) => {
   const { nombre, cantidad, precio } = producto;
 
   const handleInputChange = (event) => {
-    const { nombre, valor } = event.target;
-    switch (nombre) {
+    const { name, value } = event.target;
+    switch (name) {
       case "cantidad":
-        if (valor === "" || parseInt(valor) === valor) {
-          setProducto((prevState) => ({ ...prevState, [nombre]: valor }));
+        if (value === "" || !isNaN(Number(value))) {
+          setProducto((prevState) => ({
+            ...prevState,
+            [name]: value,
+          }));
         }
         break;
       case "precio":
-        if (valor === "" || valor.match(/^\d{1,}(\.\d{0,2})?$/)) {
-          setProducto((prevState) => ({ ...prevState, [nombre]: valor }));
+        if (value === "" || value.match(/^\d{1,}(\.\d{0,2})?$/)) {
+          setProducto((prevState) => ({
+            ...prevState,
+            [name]: value,
+          }));
         }
         break;
       default:
         setProducto((prevState) => ({
           ...prevState,
-          [nombre]: valor,
+          [name]: value,
         }));
     }
   };
 
   const handleOnSubmit = (event) => {
     event.preventDefault();
-    const valores = [nombre, cantidad, precio];
+    const valores = [nombre, precio, cantidad];
     let errorMsg = "";
 
     const todosLosCamposLlenos = valores.every((campo) => {
-      const valor = `${campo}`.trim();
-      return valor !== "" && valor !== "0";
+      const value = `${campo}`.trim();
+      return value !== "" && value !== "0";
     });
 
-    if (todosLosCamposLlenos) {
-      const producto = {
+    if (!todosLosCamposLlenos) {
+      setErrorMsg("Por favor, rellene todos los campos.");
+    } else {
+      const libro = {
         id: crypto.randomUUID(),
         nombre,
         precio,
         cantidad,
       };
-      props.handleOnSubmit(producto);
-    } else {
-      errorMsg = "Por favor, rellene todos los campos.";
+      props.handleOnSubmit(libro);
+      setErrorMsg(""); // Limpiar mensaje de error tras el envío exitoso
     }
-    setErrorMsg(errorMsg);
   };
 
   return (
     <div className="main-form">
-      <form action="" onSubmit={handleOnSubmit}>
+      <form onSubmit={handleOnSubmit}>
         <h2>Registrar producto</h2>
         {errorMsg && <p className="errorMsg">{errorMsg}</p>}
         <div className="form-group">
